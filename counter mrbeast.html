@@ -38,7 +38,6 @@
             const data = await response.json();
             let subscriberCount = parseInt(data.items[0].statistics.subscriberCount);
 
-            // Ajouter un nombre aléatoire entre 1 et 999,999
             const randomIncrement = Math.floor(Math.random() * 1000000);
             subscriberCount += randomIncrement;
 
