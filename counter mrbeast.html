@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Compteur d'abonnés de MrBeast</title>
+    <script src="https://github.hubspot.com/odometer/odometer.js"></script>
+    <link rel="stylesheet" href="https://github.hubspot.com/odometer/themes/odometer-theme-default.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+        }
+        #subscriberCount {
+            font-size: 20em;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 900;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="subscriberCount" class="odometer">0</div>
+
+    <script>
+        const API_KEY = 'AIzaSyA6rKXoWYuh85-n4IWMtusyb8lR8wAIGHs';
+        const CHANNEL_ID = 'UCX6OQ3DkcsbYNE6H8uQQuVA';  // ID de la chaîne MrBeast
+
+        async function fetchSubscriberCount() {
+            const response = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`);
+            const data = await response.json();
+            let subscriberCount = parseInt(data.items[0].statistics.subscriberCount);
+
+            // Ajouter un nombre aléatoire entre 1 et 999,999
+            const randomIncrement = Math.floor(Math.random() * 1000000);
+            subscriberCount += randomIncrement;
+
+            return subscriberCount;
+        }
+
+        async function updateSubscriberCount() {
+            let subscriberCount = parseInt(localStorage.getItem('subscriberCount')) || await fetchSubscriberCount();
+            document.getElementById('subscriberCount').innerText = subscriberCount;
+
+            setInterval(() => {
+                const increment = Math.floor(Math.random() * 11) + 5;  // Augmenter de 5 à 15
+                subscriberCount += increment;
+                document.getElementById('subscriberCount').innerText = subscriberCount;
+                localStorage.setItem('subscriberCount', subscriberCount);
+            }, 2000);
+        }
+
+        updateSubscriberCount();
+    </script>
+</body>
+</html>
