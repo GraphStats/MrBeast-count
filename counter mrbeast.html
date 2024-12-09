@@ -48,7 +48,7 @@
             document.getElementById('subscriberCount').innerText = subscriberCount;
 
             setInterval(() => {
-                const increment = Math.floor(Math.random() * 11) + 5;  // Augmenter de 5 à 15
+                const increment = Math.floor(Math.random() * 11) + 5; 
                 subscriberCount += increment;
                 document.getElementById('subscriberCount').innerText = subscriberCount;
                 localStorage.setItem('subscriberCount', subscriberCount);
