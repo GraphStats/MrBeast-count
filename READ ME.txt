@@ -1,0 +1,4 @@
+I'm still working on the project
+
+The counter is copyright-free, so you can use it for your stream without being banned.
+ATTENTION: The counter is estimated
