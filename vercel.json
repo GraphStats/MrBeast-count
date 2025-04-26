@@ -1,26 +1,5 @@
 {
-  "redirects": [
-    {
-      "source": "/(?!redirect\\.html$)(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "(.*)-git-(.*).vercel.app"
-        }
-      ],
-      "destination": "/redirect.html",
-      "permanent": false
-    },
-    {
-      "source": "/(?!redirect\\.html$)(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "(.*)-[a-z0-9]{9}-(.*).vercel.app"
-        }
-      ],
-      "destination": "/redirect.html",
-      "permanent": false
-    }
-  ]
+  "middleware": {
+    "path": "/(.*)"
+  }
 }
