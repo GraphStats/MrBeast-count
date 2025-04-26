@@ -1,0 +1,27 @@
+{
+    "redirects": [
+      {
+        "source": "/(.*)",
+        "has": [
+          {
+            "type": "host",
+            "value": "(.*)-git-(.*).vercel.app"
+          }
+        ],
+        "destination": "https://mrbeast-count.vercel.app/",
+        "permanent": false
+      },
+      {
+        "source": "/(.*)",
+        "has": [
+          {
+            "type": "host",
+            "value": "(.*)-[a-z0-9]{9}-(.*).vercel.app"
+          }
+        ],
+        "destination": "https://mrbeast-count.vercel.app/",
+        "permanent": false
+      }
+    ]
+  }
+  
