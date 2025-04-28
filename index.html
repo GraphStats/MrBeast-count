@@ -103,9 +103,9 @@
 
         async function fetchSubscriberCount() {
             try {
-                const response = await fetch('https://ests.sctools.org/api/get/UCX6OQ3DkcsbYNE6H8uQQuVA');
+                const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
                 const data = await response.json();
-                const newCount = data.stats.estCount;
+                const newCount = data.items[0].statistics.subscriberCount;  // Nouveau champ pour récupérer le nombre d'abonnés
 
                 if (newCount !== previousCount) {
                     document.getElementById('counter').innerText = newCount;
