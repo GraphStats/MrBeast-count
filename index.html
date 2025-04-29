@@ -17,7 +17,7 @@
             font-family: 'Roboto', sans-serif;
             display: grid;
             place-items: center;
-            height: 100vh; /* Hauteur de la fenêtre */
+            height: 100vh;
             margin: 0;
             grid-template-columns: 1fr;
             grid-template-rows: auto 1fr;
@@ -38,8 +38,8 @@
         }
 
         canvas {
-            width: 100%;  /* S'adapte à la largeur du conteneur */
-            height: 50vh; /* S'adapte à 50% de la hauteur de la fenêtre */
+            width: 100%;
+            height: 50vh;
         }
     </style>
 </head>
@@ -47,7 +47,7 @@
 <body>
     <div class="counter-container">
         <div id="counter" class="odometer">0</div>
-        <canvas id="subscriberChart"></canvas> <!-- Graphique Chart.js ici -->
+        <canvas id="subscriberChart"></canvas>
     </div>
 
     <script>
@@ -62,7 +62,6 @@
             };
         }
 
-        // Préparation du graphique avec fond sous la courbe
         const ctx = document.getElementById('subscriberChart').getContext('2d');
         const subscriberChart = new Chart(ctx, {
             type: 'line',
@@ -71,32 +70,26 @@
                 datasets: [{
                     label: 'Abonnés',
                     data: [],
-                    borderColor: '#22accf',  // Couleur de la ligne en bleu clair
-                    backgroundColor: 'rgba(0, 48, 59, 0.7)',  // Fond sous la courbe avec le bleu foncé
-                    fill: true,  // Active le remplissage sous la ligne
+                    borderColor: '#22accf',
+                    backgroundColor: 'rgba(0, 48, 59, 0.7)',
+                    fill: true,
                     tension: 0.2,
-                    pointRadius: 0,  // Pas de gros points sur la ligne
+                    pointRadius: 0,
                     borderWidth: 7
                 }]
             },
             options: {
-                responsive: true,  // Permet au graphique de s'adapter
-                maintainAspectRatio: true, // Garder le ratio en fonction de la fenêtre
+                responsive: true,
+                maintainAspectRatio: true,
                 animation: {
-                    duration: 0 // Désactive toute animation de Chart.js
+                    duration: 0
                 },
                 scales: {
-                    x: {
-                        display: false
-                    },
-                    y: {
-                        display: false
-                    }
+                    x: { display: false },
+                    y: { display: false }
                 },
                 plugins: {
-                    legend: {
-                        display: false
-                    }
+                    legend: { display: false }
                 }
             }
         });
@@ -105,28 +98,33 @@
             try {
                 const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
                 const data = await response.json();
-                const newCount = data.items[0].statistics.subscriberCount;  // Nouveau champ pour récupérer le nombre d'abonnés
+                const newCount = parseInt(data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
 
-                if (newCount !== previousCount) {
-                    document.getElementById('counter').innerText = newCount;
-
-                    const odometerElement = document.getElementById('counter');
-                    odometerElement.classList.add('odometer-updating');
-
-                    setTimeout(() => {
-                        odometerElement.classList.remove('odometer-updating');
-                    }, 500);
-
-                    // Mise à jour du graphique sans animation
-                    const currentTime = new Date().toLocaleTimeString();
-                    subscriberChart.data.labels.push(currentTime);
-                    subscriberChart.data.datasets[0].data.push(newCount);
-                    subscriberChart.update();
+                if (!newCount || newCount < 1000) {
+                    console.warn("Valeur ignorée (trop basse ou nulle) :", newCount);
+                    return;
                 }
 
+                if (newCount === previousCount) return;
+
+                document.getElementById('counter').innerText = newCount;
+
+                const odometerElement = document.getElementById('counter');
+                odometerElement.classList.add('odometer-updating');
+                setTimeout(() => {
+                    odometerElement.classList.remove('odometer-updating');
+                }, 500);
+
+                const currentTime = new Date().toLocaleTimeString();
+                subscriberChart.data.labels.push(currentTime);
+                subscriberChart.data.datasets[0].data.push(newCount);
+                subscriberChart.update();
+
                 previousCount = newCount;
+
             } catch (error) {
-                console.error('Erreur API:', error);
+                console.error('Erreur API :', error);
+                // Ne rien faire pour éviter la mise à jour avec des valeurs fausses
             }
         }
 
