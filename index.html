@@ -90,8 +90,8 @@
       }
     });
 
-    const backendURL = 'http://node01.inspirehost.fr:20095';
 
+    // Charger les données initiales depuis le backend
     async function loadGraphData() {
       try {
         const res = await fetch(`api/data`);
@@ -105,21 +105,7 @@
       }
     }
 
-    async function saveGraphData() {
-      try {
-        await fetch(`api/save`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            labels: subscriberChart.data.labels,
-            data: subscriberChart.data.datasets[0].data
-          })
-        });
-      } catch (e) {
-        console.error("Erreur lors de l'enregistrement JSON :", e);
-      }
-    }
-
+    // Récupérer le nombre d'abonnés et mettre à jour l'affichage
     async function fetchSubscriberCount() {
       try {
         const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
@@ -140,16 +126,15 @@
         subscriberChart.update();
 
         previousCount = newCount;
-
       } catch (error) {
         console.error('Erreur API :', error);
       }
     }
 
+    // Charger les données initiales et commencer à mettre à jour toutes les 2 secondes
     loadGraphData();
     fetchSubscriberCount();
     setInterval(fetchSubscriberCount, 2000);
-    setInterval(saveGraphData, 2000);
   </script>
 </body>
 
