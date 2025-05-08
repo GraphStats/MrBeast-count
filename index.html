@@ -90,7 +90,6 @@
       }
     });
 
-
     // Charger les données initiales depuis le backend
     async function loadGraphData() {
       try {
@@ -112,20 +111,30 @@
         const data = await response.json();
         const newCount = parseInt(data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
 
-        if (!newCount || newCount < 1000 || newCount === previousCount) return;
+        if (!newCount || newCount < 1000) return; // Assure-toi que le nombre est valide et > 1000
 
-        document.getElementById('counter').innerText = newCount;
+        // Si le nombre d'abonnés a changé
+        if (newCount !== previousCount) {
+          document.getElementById('counter').innerText = newCount;
+          const odometerElement = document.getElementById('counter');
+          odometerElement.classList.add('odometer-updating');
+          setTimeout(() => odometerElement.classList.remove('odometer-updating'), 500);
 
-        const odometerElement = document.getElementById('counter');
-        odometerElement.classList.add('odometer-updating');
-        setTimeout(() => odometerElement.classList.remove('odometer-updating'), 500);
+          // Ajouter le temps et le nombre d'abonnés au graphique
+          const currentTime = new Date().toLocaleTimeString();
+          subscriberChart.data.labels.push(currentTime);
+          subscriberChart.data.datasets[0].data.push(newCount);
+          previousCount = newCount;
+        } else {
+          // Si le nombre d'abonnés ne change pas, met à jour la dernière valeur
+          const currentTime = new Date().toLocaleTimeString();
+          subscriberChart.data.labels.push(currentTime);
+          subscriberChart.data.datasets[0].data.push(previousCount);
+        }
 
-        const currentTime = new Date().toLocaleTimeString();
-        subscriberChart.data.labels.push(currentTime);
-        subscriberChart.data.datasets[0].data.push(newCount);
+        // Mettre à jour le graphique
         subscriberChart.update();
 
-        previousCount = newCount;
       } catch (error) {
         console.error('Erreur API :', error);
       }
