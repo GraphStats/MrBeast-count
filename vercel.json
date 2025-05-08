@@ -1,0 +1,9 @@
+{
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "http://node01.inspirehost.fr:20095/:path*"
+      }
+    ]
+  }
+  

@@ -94,7 +94,7 @@
 
     async function loadGraphData() {
       try {
-        const res = await fetch(`${backendURL}/data`);
+        const res = await fetch(`api/data`);
         const saved = await res.json();
 
         subscriberChart.data.labels = saved.labels || [];
@@ -107,7 +107,7 @@
 
     async function saveGraphData() {
       try {
-        await fetch(`${backendURL}/save`, {
+        await fetch(`api/save`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
