@@ -2,135 +2,155 @@
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MrBeast Live Counter</title>
-    <link rel="stylesheet" href="https://lcedit.com/odometer/odometer.css">
-    <script src="https://lcedit.com/odometer/odometer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap");
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MrBeast Live Counter</title>
+  <link rel="stylesheet" href="https://lcedit.com/odometer/odometer.css" />
+  <script src="https://lcedit.com/odometer/odometer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap");
 
-        body {
-            background-color: #181818;
-            color: white;
-            font-family: 'Roboto', sans-serif;
-            display: grid;
-            place-items: center;
-            height: 100vh;
-            margin: 0;
-            grid-template-columns: 1fr;
-            grid-template-rows: auto 1fr;
-            gap: 20px;
-        }
+    body {
+      background-color: #181818;
+      color: white;
+      font-family: 'Roboto', sans-serif;
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      margin: 0;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 20px;
+    }
 
-        .counter-container {
-            display: grid;
-            justify-items: center;
-            gap: 20px;
-        }
+    .counter-container {
+      display: grid;
+      justify-items: center;
+      gap: 20px;
+    }
 
-        .odometer {
-            font-family: 'Roboto', sans-serif;
-            font-size: 15em;
-            font-weight: 900;
-            color: #ffffff;
-        }
+    .odometer {
+      font-family: 'Roboto', sans-serif;
+      font-size: 15em;
+      font-weight: 900;
+      color: #ffffff;
+    }
 
-        canvas {
-            width: 100%;
-            height: 50vh;
-        }
-    </style>
+    canvas {
+      width: 100%;
+      height: 50vh;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="counter-container">
-        <div id="counter" class="odometer">0</div>
-        <canvas id="subscriberChart"></canvas>
-    </div>
+  <div class="counter-container">
+    <div id="counter" class="odometer">0</div>
+    <canvas id="subscriberChart"></canvas>
+  </div>
 
-    <script>
-        let previousCount = 0;
-        const odometers = Odometer.init();
+  <script>
+    let previousCount = 0;
+    const odometers = Odometer.init();
 
-        for (let i = 0; i < odometers.length; i++) {
-            odometers[i].options = {
-                animation: ['default', 'byDigit', 'count', 'minimal'][1],
-                duration: 2000,
-                format: ',ddd'
-            };
-        }
+    for (let i = 0; i < odometers.length; i++) {
+      odometers[i].options = {
+        animation: ['default', 'byDigit', 'count', 'minimal'][1],
+        duration: 2000,
+        format: ',ddd'
+      };
+    }
 
-        const ctx = document.getElementById('subscriberChart').getContext('2d');
-        const subscriberChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Abonnés',
-                    data: [],
-                    borderColor: '#22accf',
-                    backgroundColor: 'rgba(20, 102, 123, 0.7)',
-                    fill: true,
-                    tension: 0.2,
-                    pointRadius: 0,
-                    borderWidth: 7
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                animation: {
-                    duration: 0
-                },
-                scales: {
-                    x: { display: false },
-                    y: { display: false }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
+    const ctx = document.getElementById('subscriberChart').getContext('2d');
+    const subscriberChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Abonnés',
+          data: [],
+          borderColor: '#22accf',
+          backgroundColor: 'rgba(20, 102, 123, 0.7)',
+          fill: true,
+          tension: 0.2,
+          pointRadius: 0,
+          borderWidth: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: { duration: 0 },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+
+    const backendURL = 'https://fork-superficial-mouse.glitch.me';
+
+    async function loadGraphData() {
+      try {
+        const res = await fetch(`${backendURL}/data`);
+        const saved = await res.json();
+
+        subscriberChart.data.labels = saved.labels || [];
+        subscriberChart.data.datasets[0].data = saved.data || [];
+        subscriberChart.update();
+      } catch (e) {
+        console.error("Erreur lors du chargement du JSON :", e);
+      }
+    }
+
+    async function saveGraphData() {
+      try {
+        await fetch(`${backendURL}/save`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            labels: subscriberChart.data.labels,
+            data: subscriberChart.data.datasets[0].data
+          })
         });
+      } catch (e) {
+        console.error("Erreur lors de l'enregistrement JSON :", e);
+      }
+    }
 
-        async function fetchSubscriberCount() {
-            try {
-                const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
-                const data = await response.json();
-                const newCount = parseInt(data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
+    async function fetchSubscriberCount() {
+      try {
+        const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
+        const data = await response.json();
+        const newCount = parseInt(data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
 
-                if (!newCount || newCount < 1000) {
-                    console.warn("Valeur ignorée (trop basse ou nulle) :", newCount);
-                    return;
-                }
+        if (!newCount || newCount < 1000 || newCount === previousCount) return;
 
-                if (newCount === previousCount) return;
+        document.getElementById('counter').innerText = newCount;
 
-                document.getElementById('counter').innerText = newCount;
+        const odometerElement = document.getElementById('counter');
+        odometerElement.classList.add('odometer-updating');
+        setTimeout(() => odometerElement.classList.remove('odometer-updating'), 500);
 
-                const odometerElement = document.getElementById('counter');
-                odometerElement.classList.add('odometer-updating');
-                setTimeout(() => {
-                    odometerElement.classList.remove('odometer-updating');
-                }, 500);
+        const currentTime = new Date().toLocaleTimeString();
+        subscriberChart.data.labels.push(currentTime);
+        subscriberChart.data.datasets[0].data.push(newCount);
+        subscriberChart.update();
 
-                const currentTime = new Date().toLocaleTimeString();
-                subscriberChart.data.labels.push(currentTime);
-                subscriberChart.data.datasets[0].data.push(newCount);
-                subscriberChart.update();
+        previousCount = newCount;
 
-                previousCount = newCount;
+      } catch (error) {
+        console.error('Erreur API :', error);
+      }
+    }
 
-            } catch (error) {
-                console.error('Erreur API :', error);
-                // Ne rien faire pour éviter la mise à jour avec des valeurs fausses
-            }
-        }
-
-        fetchSubscriberCount();
-        setInterval(fetchSubscriberCount, 1930);
-    </script>
+    loadGraphData();
+    fetchSubscriberCount();
+    setInterval(fetchSubscriberCount, 1930);
+    setInterval(saveGraphData, 5000);
+  </script>
 </body>
 
 </html>
