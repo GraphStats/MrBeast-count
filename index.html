@@ -100,7 +100,7 @@
     // Charger les données initiales depuis le backend
     async function loadGraphData() {
       try {
-        const res = await fetch(`api/data`);
+        const res = await fetch(`api/data-mrbeast`);
         const saved = await res.json();
 
         subscriberChart.data.labels = saved.labels || [];
