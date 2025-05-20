@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/api/:path*",
-        "destination": "http://node01.inspirehost.fr:20095/:path*"
+        "destination": "http://89.213.149.192:8005/:path*"
       }
     ]
   }
