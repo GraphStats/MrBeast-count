@@ -131,11 +131,6 @@
           odometerElement.classList.add('odometer-updating');
           setTimeout(() => odometerElement.classList.remove('odometer-updating'), 500);
 
-          // Ajouter le temps et le nombre d'abonnés au graphique
-          const currentTime = new Date().toLocaleTimeString();
-          subscriberChart.data.labels.push(currentTime);
-          subscriberChart.data.datasets[0].data.push(newCount);
-          previousCount = newCount;
         } else {
           // Si le nombre d'abonnés ne change pas, met à jour la dernière valeur
           const currentTime = new Date().toLocaleTimeString();
