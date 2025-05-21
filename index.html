@@ -48,10 +48,9 @@
     }
 
     canvas {
-  width: 100%;
-  height: 580px !important;
-}
-
+      width: 100%;
+      height: 580px !important;
+    }
   </style>
 </head>
 
@@ -104,12 +103,30 @@
     // Charger les données initiales depuis le backend
     async function loadGraphData() {
       try {
-        const res = await fetch(`api/data-mrbeast`);
-        const saved = await res.json();
-
-        subscriberChart.data.labels = saved.labels || [];
-        subscriberChart.data.datasets[0].data = saved.data || [];
+        const res = await fetch(`api/data/UCX6OQ3DkcsbYNE6H8uQQuVA`);
+        const dataPoints = await res.json();
+        
+        // Trier les données par timestamp
+        dataPoints.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        
+        // Extraire les labels (temps) et les données (abonnés)
+        const labels = dataPoints.map(point => {
+          const date = new Date(point.timestamp);
+          return date.toLocaleTimeString();
+        });
+        
+        const data = dataPoints.map(point => point.subscribers);
+        
+        subscriberChart.data.labels = labels;
+        subscriberChart.data.datasets[0].data = data;
         subscriberChart.update();
+        
+        // Mettre à jour le compteur avec la dernière valeur
+        if (data.length > 0) {
+          const latestCount = data[data.length - 1];
+          document.getElementById('counter').innerText = latestCount;
+          previousCount = latestCount;
+        }
       } catch (e) {
         console.error("Erreur lors du chargement du JSON :", e);
       }
@@ -130,24 +147,21 @@
           const odometerElement = document.getElementById('counter');
           odometerElement.classList.add('odometer-updating');
           setTimeout(() => odometerElement.classList.remove('odometer-updating'), 500);
-
-        } else {
-          // Si le nombre d'abonnés ne change pas, met à jour la dernière valeur
-          const currentTime = new Date().toLocaleTimeString();
-          subscriberChart.data.labels.push(currentTime);
-          subscriberChart.data.datasets[0].data.push(previousCount);
+          previousCount = newCount;
         }
-
-
       } catch (error) {
         console.error('Erreur API :', error);
       }
     }
 
-    fetchSubscriberCount();
+    // Charger les données initiales
+    loadGraphData();
+    
+    // Mettre à jour le compteur toutes les 2 secondes
     setInterval(fetchSubscriberCount, 2000);
+    
+    // Rafraîchir le graphique toutes les 10 secondes (ajustez selon vos besoins)
     setInterval(loadGraphData, 2000);
   </script>
 </body>
-
 </html>
