@@ -143,19 +143,15 @@
           subscriberChart.data.datasets[0].data.push(previousCount);
         }
 
-        // Mettre à jour le graphique
-        subscriberChart.update();
 
       } catch (error) {
         console.error('Erreur API :', error);
       }
     }
 
-    // Charger les données initiales et commencer à mettre à jour toutes les 2 secondes
-    loadGraphData();
     fetchSubscriberCount();
     setInterval(fetchSubscriberCount, 2000);
-    setInterval(loadGraphData, 5000);
+    setInterval(loadGraphData, 2000);
   </script>
 </body>
 
