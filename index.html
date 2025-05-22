@@ -120,7 +120,7 @@
         });
 
         // Keep max 30 points in the graph
-        while (subscriberChart.data.labels.length > 30) {
+        while (subscriberChart.data.labels.length > 10000) {
           subscriberChart.data.labels.shift();
           subscriberChart.data.datasets[0].data.shift();
         }
