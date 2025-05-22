@@ -48,12 +48,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const odometerElement = document.getElementById('counter');
-      let previousCount = 0;
-
-      // Juste un test d'animation en changeant innerHTML, pas new Odometer()
-      setTimeout(() => {
-        odometerElement.innerHTML = 12345;
-      }, 1000);
+      let previousCount = 300000000;
 
       const ctx = document.getElementById('subscriberChart').getContext('2d');
       const subscriberChart = new Chart(ctx, {
@@ -68,7 +63,7 @@
             fill: true,
             tension: 0.05,
             pointRadius: 0,
-            borderWidth: 7
+            borderWidth: 4
           }]
         },
         options: {
