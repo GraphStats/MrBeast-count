@@ -4,91 +4,71 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MrBeast Live Counter</title>
-  <link rel="icon" type="image/png" href="https://static.wikia.nocookie.net/dream_team/images/7/79/Mrbeastlogo.jpg/revision/latest?cb=20230125153030">
+  <title>Abonnés + Graph avec Mixerno & MrBeast API</title>
   <link rel="stylesheet" href="https://lcedit.com/odometer/odometer.css" />
   <script src="https://lcedit.com/odometer/odometer.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap");
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      background-color: #181818;
-      color: white;
+      background: #121212;
+      color: #eee;
       font-family: 'Roboto', sans-serif;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .counter-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      max-width: 800px;
-    }
-
-    .odometer {
-      font-family: 'Roboto', sans-serif;
-      font-size: 15vw;
-      font-weight: 900;
-      color: #ffffff;
       text-align: center;
+      padding: 1rem;
+    }
+
+    #counter {
+      font-size: 10vw;
+      font-weight: 900;
       margin-bottom: 20px;
     }
 
+    .odometer-updating {
+      color: #22accf;
+      transition: color 0.5s ease;
+    }
+
     canvas {
+      max-width: 800px;
       width: 100%;
-      height: 580px !important;
+      height: 400px !important;
+      margin: 0 auto;
     }
   </style>
 </head>
 
 <body>
-  <div class="counter-container">
-    <div id="counter" class="odometer">0</div>
-    <canvas id="subscriberChart"></canvas>
-  </div>
+  <div id="counter" class="odometer">0</div>
+  <canvas id="subscriberChart"></canvas>
 
   <script>
     let previousCount = 0;
     const odometerElement = document.getElementById('counter');
 
-    // Initialise Odometer sur le compteur
+    // Init odometer
     const odometer = new Odometer({
       el: odometerElement,
       value: 0,
       format: ',ddd',
-      duration: 2000,
+      duration: 1500,
       animation: 'count'
     });
 
-    // Initialiser Chart.js
+    // Init Chart.js
     const ctx = document.getElementById('subscriberChart').getContext('2d');
     const subscriberChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: [],
         datasets: [{
-          label: 'Abonnés',
+          label: 'Abonnés (MrBeast API)',
           data: [],
           borderColor: '#22accf',
           backgroundColor: 'rgba(20, 102, 123, 0.7)',
           fill: true,
-          tension: 0.05,
+          tension: 0.2,
           pointRadius: 0,
-          borderWidth: 7
+          borderWidth: 3
         }]
       },
       options: {
@@ -97,40 +77,77 @@
         animation: { duration: 0 },
         scales: {
           x: { display: false },
-          y: { display: false }
+          y: { display: true, beginAtZero: true }
         },
         plugins: { legend: { display: false } }
       }
     });
 
-    async function fetchData() {
+    // Ta fonction pour récupérer le nombre d'abonnés depuis Mixerno (affichage odomètre)
+    async function fetchSubscriberCount() {
       try {
-        const response = await fetch('https://mrbeast-count.vercel.app/api/data/UCX6OQ3DkcsbYNE6H8uQQuVA');
-        const json = await response.json();
+        const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
+        const data = await response.json();
+        const newCount = parseInt(data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
 
-        // Mise à jour du graph
-        subscriberChart.data.labels = json.labels || [];
-        subscriberChart.data.datasets[0].data = json.data || [];
-        subscriberChart.update();
+        if (!newCount || newCount < 1000) return;
 
-        // Mise à jour du compteur avec odometer
-        const newCount = json.currentCount || 0;
-
-        if (newCount >= 1000 && newCount !== previousCount) {
+        if (newCount !== previousCount) {
           odometer.update(newCount);
           previousCount = newCount;
 
-          // Optionnel : animation CSS
           odometerElement.classList.add('odometer-updating');
           setTimeout(() => odometerElement.classList.remove('odometer-updating'), 500);
         }
       } catch (error) {
-        console.error('Erreur fetch:', error);
+        console.error('Erreur API Mixerno:', error);
       }
     }
 
-    fetchData();
-    setInterval(fetchData, 2000);
+    // Fonction pour récupérer les données du graph depuis MrBeast API
+    async function fetchGraphData() {
+      try {
+        const response = await fetch('https://mrbeast-count.vercel.app/api/data/UCX6OQ3DkcsbYNE6H8uQQuVA');
+        const data = await response.json();
+
+        // MrBeast API donne un tableau d’objets avec timestamps et subscribers
+        // Exemple: [{ timestamp: 1684567890000, subscribers: 123456 }, ...]
+        if (!Array.isArray(data)) return;
+
+        data.forEach(point => {
+          const date = new Date(point.timestamp);
+          const label = date.toLocaleTimeString();
+
+          // Push si pas déjà présent (pour éviter doublons)
+          if (!subscriberChart.data.labels.includes(label)) {
+            subscriberChart.data.labels.push(label);
+            subscriberChart.data.datasets[0].data.push(point.subscribers);
+          }
+        });
+
+        // Garder max 30 points
+        while (subscriberChart.data.labels.length > 30) {
+          subscriberChart.data.labels.shift();
+          subscriberChart.data.datasets[0].data.shift();
+        }
+
+        subscriberChart.update();
+
+      } catch (error) {
+        console.error('Erreur API MrBeast:', error);
+      }
+    }
+
+    // Lance tout de suite la récupération de l’abonné et du graph
+    fetchSubscriberCount();
+    fetchGraphData();
+
+    // Update tous les 2s
+    setInterval(() => {
+      fetchSubscriberCount();
+      fetchGraphData();
+    }, 2000);
+
   </script>
 </body>
 
