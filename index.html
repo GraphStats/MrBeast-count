@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Odometer + Chart.js Test</title>
 
-  <!-- Odometer CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.css" />
+  <!-- Odometer CSS (correct CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/odometer@0.4.8/themes/odometer-theme-default.css" />
   <!-- Odometer JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/odometer@0.4.8/odometer.min.js"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -84,7 +84,6 @@
       }
     });
 
-    // Fetch subscriber count from Mixerno API
     async function fetchSubscriberCount() {
       try {
         const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
@@ -102,7 +101,6 @@
       }
     }
 
-    // Fetch graph data from MrBeast API
     async function fetchGraphData() {
       try {
         const response = await fetch('https://mrbeast-count.vercel.app/api/data/UCX6OQ3DkcsbYNE6H8uQQuVA');
@@ -120,7 +118,6 @@
           }
         });
 
-        // Keep max 10000 points max (reduce if needed)
         while (subscriberChart.data.labels.length > 10000) {
           subscriberChart.data.labels.shift();
           subscriberChart.data.datasets[0].data.shift();
@@ -133,11 +130,9 @@
       }
     }
 
-    // First fetch
     fetchSubscriberCount();
     fetchGraphData();
 
-    // Update every 2 seconds
     setInterval(() => {
       fetchSubscriberCount();
       fetchGraphData();
