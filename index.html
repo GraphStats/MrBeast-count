@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Abonnés + Graph avec Odometer.js & Chart.js</title>
 
+  <!-- Police Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
   <!-- Odometer CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/odometer@0.4.8/themes/odometer-theme-default.css" />
   <!-- Odometer JS -->
@@ -47,7 +49,7 @@
       const odometerElement = document.getElementById('counter');
       let previousCount = 0;
 
-      // Juste un test d’animation en changeant innerHTML, pas new Odometer()
+      // Juste un test d'animation en changeant innerHTML, pas new Odometer()
       setTimeout(() => {
         odometerElement.innerHTML = 12345;
       }, 1000);
