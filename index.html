@@ -5,8 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Abonnés + Graph avec Mixerno & MrBeast API</title>
+  <!-- Odometer CSS -->
   <link rel="stylesheet" href="https://lcedit.com/odometer/odometer.css" />
+  <!-- Odometer JS -->
   <script src="https://lcedit.com/odometer/odometer.js"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -21,11 +24,7 @@
       font-size: 10vw;
       font-weight: 900;
       margin-bottom: 20px;
-    }
-
-    .odometer-updating {
       color: #22accf;
-      transition: color 0.5s ease;
     }
 
     canvas {
@@ -44,8 +43,6 @@
   <script>
     let previousCount = 0;
     const odometerElement = document.getElementById('counter');
-
-    // Initialize odometer instance
     const odometer = new Odometer({
       el: odometerElement,
       value: 0,
@@ -119,7 +116,7 @@
           }
         });
 
-        // Limit points to max 10000 to prevent lag
+        // Garde max 10000 points (tu peux réduire si tu veux)
         while (subscriberChart.data.labels.length > 10000) {
           subscriberChart.data.labels.shift();
           subscriberChart.data.datasets[0].data.shift();
@@ -132,11 +129,11 @@
       }
     }
 
-    // Run the first fetch immediately
+    // Premier fetch direct
     fetchSubscriberCount();
     fetchGraphData();
 
-    // Update every 2 seconds
+    // Mise à jour toutes les 2 sec
     setInterval(() => {
       fetchSubscriberCount();
       fetchGraphData();
