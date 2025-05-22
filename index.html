@@ -4,13 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Abonnés + Graph avec Mixerno & MrBeast API</title>
+  <title>Odometer + Chart.js Test</title>
+
   <!-- Odometer CSS -->
-  <link rel="stylesheet" href="https://lcedit.com/odometer/odometer.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.css" />
   <!-- Odometer JS -->
-  <script src="https://lcedit.com/odometer/odometer.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body {
       background: #121212;
@@ -41,8 +43,10 @@
   <canvas id="subscriberChart"></canvas>
 
   <script>
-    let previousCount = 0;
+    // Setup Odometer
     const odometerElement = document.getElementById('counter');
+    let previousCount = 0;
+
     const odometer = new Odometer({
       el: odometerElement,
       value: 0,
@@ -51,6 +55,7 @@
       animation: 'count'
     });
 
+    // Setup Chart.js
     const ctx = document.getElementById('subscriberChart').getContext('2d');
     const subscriberChart = new Chart(ctx, {
       type: 'line',
@@ -79,6 +84,7 @@
       }
     });
 
+    // Fetch subscriber count from Mixerno API
     async function fetchSubscriberCount() {
       try {
         const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
@@ -90,15 +96,13 @@
         if (newCount !== previousCount) {
           odometer.update(newCount);
           previousCount = newCount;
-
-          odometerElement.classList.add('odometer-updating');
-          setTimeout(() => odometerElement.classList.remove('odometer-updating'), 500);
         }
-      } catch (error) {
-        console.error('Erreur API Mixerno:', error);
+      } catch (e) {
+        console.error('Erreur API Mixerno:', e);
       }
     }
 
+    // Fetch graph data from MrBeast API
     async function fetchGraphData() {
       try {
         const response = await fetch('https://mrbeast-count.vercel.app/api/data/UCX6OQ3DkcsbYNE6H8uQQuVA');
@@ -116,7 +120,7 @@
           }
         });
 
-        // Garde max 10000 points (tu peux réduire si tu veux)
+        // Keep max 10000 points max (reduce if needed)
         while (subscriberChart.data.labels.length > 10000) {
           subscriberChart.data.labels.shift();
           subscriberChart.data.datasets[0].data.shift();
@@ -124,16 +128,16 @@
 
         subscriberChart.update();
 
-      } catch (error) {
-        console.error('Erreur API MrBeast:', error);
+      } catch (e) {
+        console.error('Erreur API MrBeast:', e);
       }
     }
 
-    // Premier fetch direct
+    // First fetch
     fetchSubscriberCount();
     fetchGraphData();
 
-    // Mise à jour toutes les 2 sec
+    // Update every 2 seconds
     setInterval(() => {
       fetchSubscriberCount();
       fetchGraphData();
