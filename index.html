@@ -54,12 +54,14 @@ Plotly.newPlot(graphElement, [{
   y: subscribers,
   type: 'scatter',
   mode: 'lines',
-  line: { color: '#c678dd', width: 3 }, // Violet néon
+  line: { color: '#c678dd', width: 3 },
+  fill: 'tozeroy', // <--- C'EST ÇA QUI FAIT LE FOND
+  fillcolor: 'rgba(20, 102, 123, 0.7)', // <--- Et ça c’est la couleur du fond sous la courbe
   hoverinfo: 'none'
 }], {
   margin: { t: 0, b: 0, l: 0, r: 0 },
-  paper_bgcolor: 'rgba(20, 102, 123, 0.7)',
-  plot_bgcolor: 'rgba(20, 102, 123, 0.7)',
+  paper_bgcolor: '#121212',
+  plot_bgcolor: '#121212',
   xaxis: {
     visible: false,
     showticklabels: false,
