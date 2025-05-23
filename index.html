@@ -54,33 +54,29 @@ Plotly.newPlot(graphElement, [{
   y: subscribers,
   type: 'scatter',
   mode: 'lines',
-  line: { color: '#c678dd', width: 3 },
-  fill: 'tozeroy',
-  fillcolor: 'rgba(20, 102, 123, 0.7)',
+  line: { color: '#c678dd', width: 3 }, // Violet néon
   hoverinfo: 'none'
 }], {
-  margin: { t: 60, b: 30, l: 40, r: 20 }, // marge bien équilibrée pour que ça respire
-  paper_bgcolor: '#121212',
-  plot_bgcolor: '#121212',
+  margin: { t: 0, b: 0, l: 0, r: 0 },
+  paper_bgcolor: 'rgba(20, 102, 123, 0.7)',
+  plot_bgcolor: 'rgba(20, 102, 123, 0.7)',
   xaxis: {
     visible: false,
     showticklabels: false,
     showgrid: false,
-    zeroline: false,
+    zeroline: false
   },
   yaxis: {
     visible: false,
     showticklabels: false,
     showgrid: false,
-    zeroline: false,
-    range: [Math.min(...subscribers) * 0.95, Math.max(...subscribers) * 1.1], // padding en haut et en bas pour pas que ça colle
+    zeroline: false
   },
   showlegend: false,
 }, {
   responsive: true,
   staticPlot: true
 });
-
 
       async function fetchSubscriberCount() {
         try {
