@@ -28,43 +28,46 @@
     }
 
     #graph {
-      width: 100%;
-      max-width: 900px;
-      height: 400px;
       margin: 0 auto;
+      width: 900px;
+      height: 400px;
+      background-color: #121212;
     }
 
-    /* style inputs */
     .controls {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .controls label {
       color: #eee;
+      font-weight: 500;
     }
 
     .controls input {
       width: 80px;
-      padding: 6px 10px;
-      margin: 0 10px;
-      font-size: 1rem;
-      background: #222;
-      border: 1px solid #555;
+      padding: 5px;
       border-radius: 4px;
-      color: #eee;
+      border: none;
+      font-size: 1rem;
       text-align: center;
     }
 
     .controls button {
-      padding: 7px 15px;
-      background: #c678dd;
+      padding: 6px 12px;
+      background-color: #c678dd;
       border: none;
       border-radius: 4px;
-      color: #121212;
-      font-weight: 700;
+      color: white;
       cursor: pointer;
-      transition: background 0.3s ease;
+      font-weight: 600;
     }
 
     .controls button:hover {
-      background: #a24ccf;
+      background-color: #a05db9;
     }
   </style>
 </head>
@@ -73,11 +76,11 @@
   <div id="counter" class="odometer">0</div>
 
   <div class="controls">
-    <label for="widthInput">Largeur (px) :</label>
-    <input type="number" id="widthInput" min="300" max="1200" step="10" />
-    <label for="heightInput">Hauteur (px) :</label>
-    <input type="number" id="heightInput" min="200" max="1000" step="10" />
-    <button id="saveBtn">Save</button>
+    <label for="widthInput">Largeur (px):</label>
+    <input type="number" id="widthInput" min="100" max="1920" step="10" value="900" />
+    <label for="heightInput">Hauteur (px):</label>
+    <input type="number" id="heightInput" min="100" max="1080" step="10" value="400" />
+    <button id="saveBtn">Sauvegarder</button>
   </div>
 
   <div id="graph"></div>
@@ -85,65 +88,50 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const odometerElement = document.getElementById('counter');
-      let previousCount = 300000000;
-
       const graphElement = document.getElementById('graph');
-      let timestamps = [];
-      let subscribers = [];
+      let previousCount = 300000000;
 
       const widthInput = document.getElementById('widthInput');
       const heightInput = document.getElementById('heightInput');
       const saveBtn = document.getElementById('saveBtn');
 
-      // Fonction pour appliquer la taille du graph
-      function applyGraphSize(width, height) {
-        graphElement.style.width = width + 'px';
-        graphElement.style.height = height + 'px';
+      // Charger largeur/hauteur du localStorage
+      function loadSize() {
+        const w = localStorage.getItem('graphWidth');
+        const h = localStorage.getItem('graphHeight');
+        if (w) widthInput.value = w;
+        if (h) heightInput.value = h;
+        applySize();
       }
 
-      // Charger taille depuis localStorage ou valeurs par défaut
-      function loadGraphSize() {
-        const savedWidth = localStorage.getItem('graphWidth');
-        const savedHeight = localStorage.getItem('graphHeight');
-
-        const width = savedWidth ? parseInt(savedWidth, 10) : 900;
-        const height = savedHeight ? parseInt(savedHeight, 10) : 400;
-
-        widthInput.value = width;
-        heightInput.value = height;
-
-        applyGraphSize(width, height);
+      // Appliquer taille au div #graph
+      function applySize() {
+        graphElement.style.width = widthInput.value + 'px';
+        graphElement.style.height = heightInput.value + 'px';
+        Plotly.Plots.resize(graphElement); // Important pour redimensionner le graphique après resize du div
       }
 
-      loadGraphSize();
-
-      // Sauvegarder la taille et appliquer
       saveBtn.addEventListener('click', () => {
-        let width = parseInt(widthInput.value, 10);
-        let height = parseInt(heightInput.value, 10);
-
-        // Validation simple
-        if (isNaN(width) || width < 300) width = 900;
-        if (isNaN(height) || height < 200) height = 400;
-
-        localStorage.setItem('graphWidth', width);
-        localStorage.setItem('graphHeight', height);
-
-        applyGraphSize(width, height);
-        Plotly.Plots.resize(graphElement); // Redimensionne proprement Plotly
+        localStorage.setItem('graphWidth', widthInput.value);
+        localStorage.setItem('graphHeight', heightInput.value);
+        applySize();
       });
+
+      loadSize();
+
+      let timestamps = [];
+      let subscribers = [];
 
       Plotly.newPlot(graphElement, [{
         x: timestamps,
         y: subscribers,
         type: 'scatter',
         mode: 'lines',
-        line: { color: '#c678dd', width: 3 }, // Violet néon
+        line: { color: '#c678dd', width: 3 },
         hoverinfo: 'none',
-        backgroundColor: 'rgba(20, 102, 123, 0.7)',
       }], {
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        paper_bgcolor: '#121212', // fond noir foncé
+        paper_bgcolor: '#121212',
         plot_bgcolor: '#121212',
         xaxis: {
           visible: false,
@@ -160,9 +148,8 @@
         showlegend: false,
       }, {
         responsive: true,
-        staticPlot: true // pas de zoom ni interaction
+        staticPlot: true
       });
-
 
       async function fetchSubscriberCount() {
         try {
