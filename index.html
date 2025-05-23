@@ -4,16 +4,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Abonnés + Graph avec Odometer.js & Chart.js</title>
+  <title>Abonnés + Graph avec Odometer.js & Plotly.js</title>
 
-  <!-- Police Roboto -->
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+  <!-- Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet">
   <!-- Odometer CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/odometer@0.4.8/themes/odometer-theme-default.css" />
   <!-- Odometer JS -->
   <script src="https://cdn.jsdelivr.net/npm/odometer@0.4.8/odometer.min.js"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   <style>
     body {
@@ -25,17 +25,16 @@
     }
 
     #counter {
-      font-family: 'Roboto';
       font-size: 10vw;
       font-weight: 600;
       margin-bottom: 20px;
-      color: #ffffff;
+      color: #fff;
     }
 
-    canvas {
-      max-width: 800px;
+    #graph {
       width: 100%;
-      height: 400px !important;
+      max-width: 900px;
+      height: 400px;
       margin: 0 auto;
     }
   </style>
@@ -43,40 +42,32 @@
 
 <body>
   <div id="counter" class="odometer">0</div>
-  <canvas id="subscriberChart"></canvas>
+  <div id="graph"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const odometerElement = document.getElementById('counter');
       let previousCount = 300000000;
 
-      const ctx = document.getElementById('subscriberChart').getContext('2d');
-      const subscriberChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'Abonnés',
-            data: [],
-            borderColor: '#22accf',
-            backgroundColor: 'rgba(20, 102, 123, 0.7)',
-            fill: true,
-            tension: 0.05,
-            pointRadius: 0,
-            borderWidth: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: { duration: 0 },
-          scales: {
-            x: { display: false },
-            y: { display: false }
-          },
-          plugins: { legend: { display: false } }
-        }
-      });
+      const graphElement = document.getElementById('graph');
+      let timestamps = [];
+      let subscribers = [];
+
+      Plotly.newPlot(graphElement, [{
+        x: timestamps,
+        y: subscribers,
+        type: 'scatter',
+        mode: 'lines',
+        line: { color: '#22accf', width: 4 },
+        fill: 'tozeroy'
+      }], {
+        margin: { t: 20, b: 40, l: 30, r: 30 },
+        paper_bgcolor: '#121212',
+        plot_bgcolor: '#121212',
+        xaxis: { showgrid: false, color: '#aaa' },
+        yaxis: { showgrid: false, color: '#aaa' },
+        showlegend: false
+      }, { responsive: true });
 
       async function fetchSubscriberCount() {
         try {
@@ -87,12 +78,11 @@
           if (!newCount || newCount < 1000) return;
 
           if (newCount !== previousCount) {
-            // Pour changer la valeur et déclencher l'animation odometer, on met à jour innerHTML
             odometerElement.innerHTML = newCount;
             previousCount = newCount;
           }
-        } catch (error) {
-          console.error('Erreur API Mixerno:', error);
+        } catch (err) {
+          console.error('Erreur API Mixerno:', err);
         }
       }
 
@@ -105,32 +95,32 @@
 
           data.forEach(point => {
             const date = new Date(point.timestamp);
-            const label = date.toLocaleTimeString();
+            const timeLabel = date.toLocaleTimeString();
 
-            if (!subscriberChart.data.labels.includes(label)) {
-              subscriberChart.data.labels.push(label);
-              subscriberChart.data.datasets[0].data.push(point.subscribers);
+            if (!timestamps.includes(timeLabel)) {
+              timestamps.push(timeLabel);
+              subscribers.push(point.subscribers);
             }
           });
 
-          // Garde max 10000 points
-          while (subscriberChart.data.labels.length > 10000) {
-            subscriberChart.data.labels.shift();
-            subscriberChart.data.datasets[0].data.shift();
+          // Trim to last 10000
+          if (timestamps.length > 10000) {
+            timestamps = timestamps.slice(-10000);
+            subscribers = subscribers.slice(-10000);
           }
 
-          subscriberChart.update();
+          Plotly.update(graphElement, {
+            x: [timestamps],
+            y: [subscribers]
+          });
 
-        } catch (error) {
-          console.error('Erreur API MrBeast:', error);
+        } catch (err) {
+          console.error('Erreur API MrBeast:', err);
         }
       }
 
-      // Run direct au chargement
       fetchSubscriberCount();
       fetchGraphData();
-
-      // Update toutes les 2 secondes
       setInterval(() => {
         fetchSubscriberCount();
         fetchGraphData();
