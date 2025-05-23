@@ -6,13 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Abonnés + Graph avec Odometer.js & Plotly.js</title>
 
-  <!-- Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap" rel="stylesheet">
-  <!-- Odometer CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/odometer@0.4.8/themes/odometer-theme-default.css" />
-  <!-- Odometer JS -->
   <script src="https://cdn.jsdelivr.net/npm/odometer@0.4.8/odometer.min.js"></script>
-  <!-- Plotly -->
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   <style>
@@ -64,8 +60,18 @@
         margin: { t: 20, b: 40, l: 30, r: 30 },
         paper_bgcolor: '#121212',
         plot_bgcolor: '#121212',
-        xaxis: { showgrid: false, color: '#aaa' },
-        yaxis: { showgrid: false, color: '#aaa' },
+        xaxis: {
+          visible: false,
+          showticklabels: false,
+          showgrid: false,
+          zeroline: false
+        },
+        yaxis: {
+          visible: false,
+          showticklabels: false,
+          showgrid: false,
+          zeroline: false
+        },
         showlegend: false
       }, { responsive: true });
 
@@ -103,7 +109,6 @@
             }
           });
 
-          // Trim to last 10000
           if (timestamps.length > 10000) {
             timestamps = timestamps.slice(-10000);
             subscribers = subscribers.slice(-10000);
