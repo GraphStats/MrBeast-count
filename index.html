@@ -59,29 +59,28 @@ Plotly.newPlot(graphElement, [{
   fillcolor: 'rgba(20, 102, 123, 0.7)',
   hoverinfo: 'none'
 }], {
-  margin: { t: 40, b: 0, l: 0, r: 0 }, // ajoute 40px de marge en haut pour que ce soit pas collé
+  margin: { t: 60, b: 30, l: 40, r: 20 }, // marge bien équilibrée pour que ça respire
   paper_bgcolor: '#121212',
   plot_bgcolor: '#121212',
   xaxis: {
     visible: false,
     showticklabels: false,
     showgrid: false,
-    zeroline: false
+    zeroline: false,
   },
   yaxis: {
     visible: false,
     showticklabels: false,
     showgrid: false,
     zeroline: false,
-    autorange: true,
-    // ou tu peux forcer une plage avec un peu de "padding" en haut, par ex :
-    // range: [Math.min(...subscribers)*0.9, Math.max(...subscribers)*1.1]
+    range: [Math.min(...subscribers) * 0.95, Math.max(...subscribers) * 1.1], // padding en haut et en bas pour pas que ça colle
   },
   showlegend: false,
 }, {
   responsive: true,
   staticPlot: true
 });
+
 
       async function fetchSubscriberCount() {
         try {
