@@ -55,11 +55,11 @@ Plotly.newPlot(graphElement, [{
   type: 'scatter',
   mode: 'lines',
   line: { color: '#c678dd', width: 3 },
-  fill: 'tozeroy', // <--- C'EST ÇA QUI FAIT LE FOND
-  fillcolor: 'rgba(20, 102, 123, 0.7)', // <--- Et ça c’est la couleur du fond sous la courbe
+  fill: 'tozeroy',
+  fillcolor: 'rgba(20, 102, 123, 0.7)',
   hoverinfo: 'none'
 }], {
-  margin: { t: 0, b: 0, l: 0, r: 0 },
+  margin: { t: 40, b: 0, l: 0, r: 0 }, // ajoute 40px de marge en haut pour que ce soit pas collé
   paper_bgcolor: '#121212',
   plot_bgcolor: '#121212',
   xaxis: {
@@ -72,7 +72,10 @@ Plotly.newPlot(graphElement, [{
     visible: false,
     showticklabels: false,
     showgrid: false,
-    zeroline: false
+    zeroline: false,
+    autorange: true,
+    // ou tu peux forcer une plage avec un peu de "padding" en haut, par ex :
+    // range: [Math.min(...subscribers)*0.9, Math.max(...subscribers)*1.1]
   },
   showlegend: false,
 }, {
