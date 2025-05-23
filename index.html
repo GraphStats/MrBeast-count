@@ -55,11 +55,12 @@ Plotly.newPlot(graphElement, [{
   type: 'scatter',
   mode: 'lines',
   line: { color: '#c678dd', width: 3 }, // Violet néon
-  hoverinfo: 'none'
+  hoverinfo: 'none',
+  backgroundColor: 'rgba(20, 102, 123, 0.7)',
 }], {
   margin: { t: 0, b: 0, l: 0, r: 0 },
-  paper_bgcolor: 'rgba(20, 102, 123, 0.7)',
-  plot_bgcolor: 'rgba(20, 102, 123, 0.7)',
+  paper_bgcolor: '#121212', // fond noir foncé
+  plot_bgcolor: '#121212',
   xaxis: {
     visible: false,
     showticklabels: false,
@@ -75,8 +76,9 @@ Plotly.newPlot(graphElement, [{
   showlegend: false,
 }, {
   responsive: true,
-  staticPlot: true
+  staticPlot: true // pas de zoom ni interaction
 });
+
 
       async function fetchSubscriberCount() {
         try {
