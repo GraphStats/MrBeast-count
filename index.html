@@ -47,34 +47,33 @@
       let timestamps = [];
       let subscribers = [];
 
-      // Init plot vide
       Plotly.newPlot(graphElement, [{
         x: timestamps,
         y: subscribers,
         type: 'scatter',
-        mode: 'lines+markers',
-        line: { color: '#20badc', width: 3 },
-        marker: { size: 6 },
-        hoverinfo: 'x+y',
+        mode: 'lines',
+        line: { color: '#20badc', width: 4 },
+        hoverinfo: 'none',
       }], {
-        margin: { t: 20, b: 40, l: 50, r: 20 },
+        margin: { t: 0, b: 0, l: 0, r: 0 },
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
         xaxis: {
-          title: 'Temps',
-          showgrid: true,
-          zeroline: false,
-          color: '#eee'
+          visible: false,
+          showticklabels: false,
+          showgrid: false,
+          zeroline: false
         },
         yaxis: {
-          title: 'Abonnés',
-          showgrid: true,
-          zeroline: false,
-          color: '#eee'
+          visible: false,
+          showticklabels: false,
+          showgrid: false,
+          zeroline: false
         },
         showlegend: false,
       }, {
         responsive: true,
+        staticPlot: true
       });
 
       async function fetchSubscriberCount() {
