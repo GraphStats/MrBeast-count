@@ -171,7 +171,7 @@
             subscribers.push(newCount);
 
             // Limit data points to last 30 to avoid overload
-            if (timestamps.length > 30) {
+            if (timestamps.length > 3000) {
               timestamps.shift();
               subscribers.shift();
             }
