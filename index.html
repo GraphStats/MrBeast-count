@@ -120,6 +120,7 @@
       let timestamps = [];
       let subscribers = [];
 
+      // Initial plot
       Plotly.newPlot(graphElement, [{
         x: timestamps,
         y: subscribers,
@@ -144,27 +145,27 @@
           const response = await fetch('http://localhost:3000/data');
           const jsonData = await response.json();
 
-          // Récupérer le dernier élément pour la valeur la plus récente
-          const lastEntry = jsonData[jsonData.length - 1];
-          const newCount = parseInt(lastEntry?.data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
+          if (!Array.isArray(jsonData)) return;
 
-          if (!newCount || newCount < 1000) return;
+          // On garde seulement les 3000 derniers points pour ne pas lagger
+          const recentData = jsonData.slice(-3000);
 
-          if (newCount !== previousCount) {
-            odometerElement.innerHTML = newCount;
-            previousCount = newCount;
+          timestamps = recentData.map(entry => {
+            const t = entry.timestamp || entry.data?.t || Date.now();
+            return new Date(t).toLocaleTimeString();
+          });
 
-            const now = new Date();
-            timestamps.push(now.toLocaleTimeString());
-            subscribers.push(newCount);
+          subscribers = recentData.map(entry => {
+            return parseInt(entry?.data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
+          });
 
-            if (timestamps.length > 3000) {
-              timestamps.shift();
-              subscribers.shift();
-            }
-
-            Plotly.update(graphElement, { x: [timestamps], y: [subscribers] });
+          const lastCount = subscribers[subscribers.length - 1];
+          if (lastCount && lastCount !== previousCount) {
+            odometerElement.innerHTML = lastCount;
+            previousCount = lastCount;
           }
+
+          Plotly.update(graphElement, { x: [timestamps], y: [subscribers] });
         } catch (err) {
           console.error('Erreur API locale:', err);
         }
