@@ -95,7 +95,6 @@
       const heightInput = document.getElementById('heightInput');
       const saveBtn = document.getElementById('saveBtn');
 
-      // Load size from localStorage
       function loadSize() {
         const w = localStorage.getItem('graphWidth');
         const h = localStorage.getItem('graphHeight');
@@ -104,11 +103,10 @@
         applySize();
       }
 
-      // Apply size to graph div
       function applySize() {
         graphElement.style.width = widthInput.value + 'px';
         graphElement.style.height = heightInput.value + 'px';
-        Plotly.Plots.resize(graphElement); // Resize graph after changing div size
+        Plotly.Plots.resize(graphElement);
       }
 
       saveBtn.addEventListener('click', () => {
@@ -119,11 +117,9 @@
 
       loadSize();
 
-      // Data in-memory for the graph
       let timestamps = [];
       let subscribers = [];
 
-      // Initialize empty Plotly graph
       Plotly.newPlot(graphElement, [{
         x: timestamps,
         y: subscribers,
@@ -135,18 +131,8 @@
         margin: { t: 0, b: 0, l: 0, r: 0 },
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
-        xaxis: {
-          visible: false,
-          showticklabels: false,
-          showgrid: false,
-          zeroline: false
-        },
-        yaxis: {
-          visible: false,
-          showticklabels: false,
-          showgrid: false,
-          zeroline: false
-        },
+        xaxis: { visible: false, showticklabels: false, showgrid: false, zeroline: false },
+        yaxis: { visible: false, showticklabels: false, showgrid: false, zeroline: false },
         showlegend: false,
       }, {
         responsive: true,
@@ -155,9 +141,12 @@
 
       async function fetchSubscriberCount() {
         try {
-          const response = await fetch('https://backend.mixerno.space/api/youtube/estv3/UCX6OQ3DkcsbYNE6H8uQQuVA');
-          const data = await response.json();
-          const newCount = parseInt(data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
+          const response = await fetch('http://localhost:3000/data');
+          const jsonData = await response.json();
+
+          // Récupérer le dernier élément pour la valeur la plus récente
+          const lastEntry = jsonData[jsonData.length - 1];
+          const newCount = parseInt(lastEntry?.data?.items?.[0]?.statistics?.subscriberCount || "0", 10);
 
           if (!newCount || newCount < 1000) return;
 
@@ -165,29 +154,22 @@
             odometerElement.innerHTML = newCount;
             previousCount = newCount;
 
-            // Push new data to arrays
             const now = new Date();
             timestamps.push(now.toLocaleTimeString());
             subscribers.push(newCount);
 
-            // Limit data points to last 30 to avoid overload
             if (timestamps.length > 3000) {
               timestamps.shift();
               subscribers.shift();
             }
 
-            // Update Plotly graph
-            Plotly.update(graphElement, {
-              x: [timestamps],
-              y: [subscribers]
-            });
+            Plotly.update(graphElement, { x: [timestamps], y: [subscribers] });
           }
         } catch (err) {
-          console.error('Erreur API Mixerno:', err);
+          console.error('Erreur API locale:', err);
         }
       }
 
-      // Initial fetch + interval every 2 sec
       fetchSubscriberCount();
       setInterval(fetchSubscriberCount, 2000);
     });
